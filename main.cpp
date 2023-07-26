@@ -461,6 +461,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//書き込むためのアドレスを取得
 	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
 	//今回は赤を書き込んで見る
+	//白
 	*materialData = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 
 
@@ -660,6 +661,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	device->CreateDepthStencilView(depthStencilResource, &dsvDesc, dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
 
+
 	MSG msg{};
 	//ウィンドウの×ボタンが押されるまでループ
 	while (msg.message != WM_QUIT)
@@ -678,7 +680,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			ImGui::NewFrame();
 
 			//開発用UIの処理。実際に開発用のUIを出す場合はここをゲーム固有の処理に置き換える
-			ImGui::ShowDemoWindow();
+			//ImGui::ShowDemoWindow();
+			ImGui::Begin("Color");
+			float material[] = {
+				materialData->x,
+				materialData->y,
+				materialData->z,
+			};
+			ImGui::SliderFloat3("Color", material, 0.0f, 1.0f);
+			ImGui::End();
+
+			materialData->x = material[0];
+			materialData->y = material[1];
+			materialData->z = material[2];
 
 			transform.rotate.y += 0.03f;
 
