@@ -189,6 +189,29 @@ struct VertexData {
 	Vector2 texcoord;
 };
 
+enum BlendMode {
+	//!< ブレンドなし
+	kBlendModeNone,
+
+	//!< 通常αブレンド。デフォルト。 Src * SrcA + Dest * (1 - SrcA)
+	kBlendModeNormal,
+
+	//!< 加算。Src * SrcA + Dest * 1
+	kBlendModeAdd,
+
+	//!< 減算。Dest * 1 - Src * SrcA
+	kBlendModeSubtract,
+
+	//!< 乗算。Src * 0 + Dest * Src
+	kBlendModeMultily,
+
+	//!< スクリーン。Src * (1 - Dest) + Dest * 1
+	kBlendModeScreen,
+
+	// 利用してはいけない
+	kCountOfBlendMode,
+};
+
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//COMの初期化
@@ -496,6 +519,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	D3D12_BLEND_DESC blendDesc{};
 	//すべての色要素を書き込む
 	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	blendDesc.RenderTarget[0].BlendEnable = TRUE;
+	blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+	blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+	blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
 
 	//RasiterzerStateの設定
 	D3D12_RASTERIZER_DESC rasterizerDesc{};
@@ -796,6 +826,30 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			//開発用UIの処理。実際に開発用のUIを出す場合はここをゲーム固有の処理に置き換える
 			ImGui::ShowDemoWindow();
+
+
+			ImGui::Begin("Color");
+			float material[] = {
+				materialData->x,
+				materialData->y,
+				materialData->z,
+				materialData->w
+			};
+			//ImGui::SliderFloat3("Color", material, 0.0f, 1.0f); //名前、数値、下限、上限
+
+			ImGui::ColorEdit4("Color", material, 0);
+
+			//float alpha[] = { materialData->w };
+
+			//ImGui::SliderFloat("ALPHA", alpha, 0.0f, 1.0f);
+
+			ImGui::End();
+
+			materialData->x = material[0];
+			materialData->y = material[1];
+			materialData->z = material[2];
+			materialData->w = material[3];
+			//materialData->w = alpha[0];
 
 			transform.rotate.y += 0.003f;
 
